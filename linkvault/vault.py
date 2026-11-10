@@ -74,7 +74,12 @@ class LinkVault:
 
     def _load(self) -> None:
         if self.storage_path.exists():
-            raw = json.loads(self.storage_path.read_text(encoding="utf-8"))
+            try:
+                raw = json.loads(self.storage_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
+                raise ValueError(f"Cannot read storage file {self.storage_path}: {exc}") from exc
+            if not isinstance(raw, list):
+                raise ValueError(f"Cannot read storage file {self.storage_path}: expected a JSON array")
             self.bookmarks = [Bookmark.from_dict(b) for b in raw]
         else:
             self.bookmarks = []
