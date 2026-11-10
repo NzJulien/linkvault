@@ -256,7 +256,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except ValueError as exc:
+        print(c(f"Error: {exc}", Color.RED))
+        return 1
 
 
 if __name__ == "__main__":
